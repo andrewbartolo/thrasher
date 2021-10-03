@@ -3,6 +3,7 @@
 
 #include <mutex>
 #include <random>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -32,19 +33,22 @@ class Thrasher {
         void block_update_fn(char* block);
 
         typedef enum {
-            ITERATION_MODE_SEQUENTIAL,
+            ITERATION_MODE_FILE,
             ITERATION_MODE_RANDOM,
+            ITERATION_MODE_SEQUENTIAL,
             ITERATION_MODE_INVALID,
         } iteration_mode_t;
 
+        std::string input_filepath;
         size_t arena_n_bytes;
         size_t block_n_bytes;
-        size_t n_iterations;
+        ssize_t n_iterations;
         size_t n_threads;
         ssize_t n_locks;
         iteration_mode_t iteration_mode;
 
-        char* arena_base;
+        int arena_fd = -1;
+        uint64_t* arena_base;
         size_t n_blocks;
         size_t block_n_bytes_log2;
         std::vector<std::thread> threads;
