@@ -4,6 +4,7 @@
 #include <random>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/types.h>
@@ -21,6 +22,10 @@
 Thrasher::Thrasher(int argc, char* argv[])
 {
     parse_and_validate_args(argc, argv);
+
+    // if n. threads unspecified, use OMP_NUM_THREADS
+    if (n_threads == 0)
+        n_threads = std::stol(getenv("OMP_NUM_THREADS"));
 
     // allocate the memory arena
     if (iteration_mode == ITERATION_MODE_FILE) {
@@ -144,9 +149,6 @@ Thrasher::parse_and_validate_args(int argc, char* argv[])
             __builtin_popcount(block_n_bytes) != 1)
         die("block size must be a power of two");
 
-    if (n_threads == 0)
-        die("must specify a non-zero num. threads: <-t N_THREADS>");
-
     size_t n_hw_threads = std::thread::hardware_concurrency();
     if (n_threads > n_hw_threads) warn("running with more threads than are "
             "available on the system (" + std::to_string(n_hw_threads) + ")");
@@ -166,7 +168,7 @@ void
 Thrasher::run()
 {
 
-    printf("Kicking off threads...\n");
+    printf("Kicking off %zu threads...\n", n_threads);
 
 
     for (size_t i = 0; i < n_threads; ++i) {

@@ -43,7 +43,7 @@ class Thrasher {
         size_t arena_n_bytes;
         size_t block_n_bytes;
         ssize_t n_iterations;
-        size_t n_threads;
+        size_t n_threads = 0;
         ssize_t n_locks;
         iteration_mode_t iteration_mode;
 
